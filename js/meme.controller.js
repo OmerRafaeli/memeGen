@@ -1,6 +1,34 @@
 'use strict'
 
 let gIsMemeRatioSet = false
+function renderMeme() {
+    drawImg()
+}
+
+function drawImg() {
+    const img = new Image()
+    img.src = `img/${gMeme.selectionId}.jpg`
+    if (!gIsMemeRatioSet) setCanvasSize(gElCanvas, img)
+    img.onload = () => {
+        gCtx.drawImage(img, 0, 0, img.width, img.height)
+        gMeme.lines.forEach(function (line, idx) {
+            onSwitchLine()
+            if (line.posX === 0) {
+                const txtPosX = img.width / 2
+                const txtPosY = setTextHeight(idx, img.height)
+                drawText(line.txt, txtPosX, txtPosY, line)
+
+                const txtWidth = gCtx.measureText(line.txt).width
+                const txtHeight = line.size
+                updateTextInfo(txtWidth, txtHeight, txtPosX, txtPosY)
+                // console.log('txtWidth:', txtWidth)
+
+            } else {
+                drawText(line.txt, line.posX, line.posY, line)
+            }
+        })
+    }
+}
 
 function onSaveMemes() {
     var savedMeme = gSavedMemes.find(meme => gCurrMeme.id === meme.id)
@@ -34,35 +62,6 @@ function onChangeTextSize(elBtn) {
     renderMeme(memeId)
 }
 
-function renderMeme(id) {
-    getMeme(id)
-    drawImg()
-}
-
-
-function drawImg() {
-    // gCtx.clearRect(0, 0, gElCanvas.width, gElCanvas.height)    
-    const img = new Image()
-    img.src = `img/${gMeme.selectionId}.jpg`
-    if (!gIsMemeRatioSet) setCanvasSize(gElCanvas, img)
-    img.onload = () => {
-        gCtx.drawImage(img, 0, 0, img.width, img.height)
-        gMeme.lines.forEach(function (line, idx) {
-            onSwitchLine()
-            if (line.posX === 0) {
-                const txtWidth = gCtx.measureText(line.txt) / 2
-                const txtHeight = line.size + 10
-                const txtPosX = img.width / 2
-                const txtPosY = setTextHeight(idx, img.height)
-                updateTextInfo(txtWidth, txtHeight, txtPosX, txtPosY)
-                drawText(line.txt, txtPosX, txtPosY, line)
-            } else {
-                drawText(line.txt, line.posX, line.posY, line)
-            }
-        })
-    }
-}
-
 function onCreateTxtLine() {
     createNewTextLine()
     document.querySelector('.meme-txt-input').value = 'Enter Text Here'
@@ -83,7 +82,7 @@ function onSwitchLine() {
     if (gMeme.memeLineIdx > gMeme.lines.length - 1) gMeme.memeLineIdx = 0
     document.querySelector('.meme-txt-input').value = getSelectedLine().txt
     document.querySelector('.stroke-color-btn').value = getSelectedLine().stroke
-    document.querySelector('.txt-color-btn').value = getSelectedLine().color
+    document.querySelector('.txt-color-btn').value = getSelectedLine().color    
 }
 
 function onRemoveLine() {
@@ -124,7 +123,42 @@ function onMoveLine(dir) {
     } else {
         changeTextPos(5)
     }
-    renderMeme(gCurrMeme.id)
+    renderMeme()
+}
+
+function onDown(ev) {
+    // Getting the clicked position
+    const pos = getEvPos(ev)
+    if (!isTextLineClicked(pos, ev)) return
+    setLineDrag(true)
+    gTextLinePos = pos
+    document.body.style.cursor = 'grabbing'
+    
+}
+
+function onMove(ev) {
+    if (!getSelectedLine.isDragging) return
+    const pos = getEvPos(ev)
+    const dx = pos.x - gTextLinePos.x
+    const dy = pos.y - gTextLinePos.y
+    moveTextLine(dx, dy)
+    gTextLinePos = pos
+    renderMeme()
+}
+
+function onUp() {
+    if(getSelectedLine.isDragging){
+    const elMemeTextInput = document.querySelector('.meme-txt-input')
+    elMemeTextInput.value = getSelectedLine().txt
+    elMemeTextInput.focus()
+    }
+    setLineDrag(false)
+    document.body.style.cursor = 'unset'
+}
+
+function moveTextLine(dx, dy) {
+    getSelectedLine().posX += dx
+    getSelectedLine().posY += dy
 }
 
 

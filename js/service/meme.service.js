@@ -50,8 +50,6 @@ let gRandomMemeTxt = [
     'Hold my beer'
 ]
 
-
-
 let gMeme = {
     selectionId: 0,
     memeLineIdx: 0,
@@ -66,14 +64,10 @@ let gMeme = {
             width: 0,
             height: 0,
             posX: 0,
-            posY: 0
+            posY: 0,
+            isDragging: false
         },
     ]
-}
-
-function setLineTxtForEdit(txt) {
-    if (!gMeme.lines.length || gMeme.lines === [])
-    getSelectedLine().txt = txt
 }
 
 function getMeme(id) {
@@ -86,6 +80,18 @@ function getMeme(id) {
 
 function setImg(id) {
     gMeme.selectionId = id
+}
+
+function setCanvasSize(canvas, img) {
+    let height, width
+
+    canvas.height = img.height
+    canvas.width = img.width
+
+    width = img.width
+    height = img.height
+
+    gIsMemeRatioSet = true
 }
 
 function changeFontSize(num) {
@@ -102,54 +108,6 @@ function setFontColor(clr) {
 
 function setStrokeColor(clr) {
     getSelectedLine().stroke = clr
-}
-
-function getSelectedLine(){
-    return gMeme.lines[gMeme.memeLineIdx]
-}
-
-function removeCurrTextLine() {
-    let lineIdx = gMeme.memeLineIdx
-    if (gMeme.lines.length === 1) return
-    gMeme.lines.splice(lineIdx, 1)
-}
-
-function resizeCanvas() {
-    let elContainer = document.querySelector('#my-canvas')
-    gElCanvas.width = elContainer.offsetWidth
-    gElCanvas.height = elContainer.offsetHeight
-    renderMeme()
-}
-
-function drawText(txt, x, y, gMeme) {
-    gCtx.beginPath()
-    gCtx.textBaseline = 'middle'
-    gCtx.textAlign = gMeme.align
-    gCtx.lineWidth = 1
-    gCtx.font = gMeme.size + `px ${gMeme.font}`
-    gCtx.fillStyle = gMeme.color + ''
-    gCtx.fillText(txt, x, y)
-    gCtx.strokeStyle = gMeme.stroke
-    gCtx.strokeText(txt, x, y)
-    gCtx.closePath()
-}
-
-function createNewTextLine() {
-    const newText = {
-        txt: 'Enter Text Here',
-        size: 35,
-        align: 'center',
-        color: '#f6f6f6',
-        stroke: '#111111',
-        font: 'impact',
-        width: 0,
-        height: 0,
-        posX: 0,
-        posY: 0
-    }
-
-    gMeme.lines.push(newText)
-    gMeme.memeLineIdx = gMeme.lines.length - 1
 }
 
 function getRandomImg() {
@@ -172,7 +130,8 @@ function getRandomText() {
             width: 0,
             height: 0,
             posX: 0,
-            posY: 0
+            posY: 0,
+            isDragging: false
         }
 
         gMeme.lines.push(newText)
@@ -188,7 +147,8 @@ function getRandomText() {
         width: 0,
         height: 0,
         posX: 0,
-        posY: 0
+        posY: 0,
+        isDragging: false
     }
 
 }
@@ -196,11 +156,69 @@ function getRandomText() {
 function setTextHeight(idx, height) {
     if (idx === 0) {
         return height / 10
+    } else if (idx === 1 && gMeme.lines[0].posY > height / 4) {
+        return height / 10
     } else if (idx === 1) {
         return height - 35
-    } else {
+    } else if (idx > 1 && gMeme.lines[0].posY === height / 2) {
+        return height - 35
+    } else if (idx > 1) {
         return height / 2
     }
+}
+
+function getSelectedLine() {
+    return gMeme.lines[gMeme.memeLineIdx]
+}
+
+function drawText(txt, x, y, gMeme) {
+    gCtx.beginPath()
+    gCtx.textBaseline = 'middle'
+    gCtx.textAlign = gMeme.align
+    gCtx.lineWidth = 1
+    gCtx.font = gMeme.size + `px ${gMeme.font}`
+    gCtx.fillStyle = gMeme.color + ''
+    gCtx.fillText(txt, x, y)
+    gCtx.strokeStyle = gMeme.stroke
+    gCtx.strokeText(txt, x, y)
+    gCtx.closePath()
+}
+
+function setLineTxtForEdit(txt) {
+    if (!gMeme.lines.length || gMeme.lines === [])
+        getSelectedLine().txt = txt
+}
+
+function removeCurrTextLine() {
+    let lineIdx = gMeme.memeLineIdx
+    if (gMeme.lines.length === 1) return
+    gMeme.lines.splice(lineIdx, 1)
+}
+
+function resizeCanvas() {
+    let elContainer = document.querySelector('#my-canvas')
+    gElCanvas.width = elContainer.offsetWidth
+    gElCanvas.height = elContainer.offsetHeight
+    renderMeme()
+}
+
+function createNewTextLine() {
+    const newText = {
+        txt: 'Enter Text Here',
+        size: 35,
+        align: 'center',
+        color: '#f6f6f6',
+        stroke: '#111111',
+        font: 'impact',
+        width: 0,
+        height: 0,
+        posX: 0,
+        posY: 0,
+        isDragging: false
+    }
+
+    gMeme.lines.push(newText)
+    gMeme.memeLineIdx = gMeme.lines.length - 1
 }
 
 function resetMemeText() {
@@ -214,7 +232,8 @@ function resetMemeText() {
         width: 0,
         height: 0,
         posX: 0,
-        posY: 0
+        posY: 0,
+        isDragging: false
     }]
 
 }
@@ -230,23 +249,23 @@ function updateTextInfo(width, height, posX, posY) {
     getSelectedLine().posY = posY
 }
 
-function setCanvasSize(canvas, img){
-    let height, width
+function setLineDrag(bool) {
+    getSelectedLine.isDragging = bool
+    console.log('bool:', bool)
     
-    canvas.height = img.height
-    canvas.width = img.width
-    
-    width = img.width
-    height = img.height
+}
 
-    // if(img.width <= 350){
+function isTextLineClicked(clickedPos, ev) { 
 
-    //     getSelectedLine().size = img.width * 0.06
-    // }else{
-    //     getSelectedLine().size = img.width * 0.1
-        
+    // gMeme.lines.forEach(function (line, idx) {if(line.posY === getSelectedLine().posY){
+    //     gMeme.memeLineIdx = idx
     // }
+    // })
 
-
-    gIsMemeRatioSet = true
+        const { posX, posY, width, height } = getSelectedLine()    
+        gCtx.beginPath()
+        drawRec(posX - (width / 2), posY - (getSelectedLine().size / 2), width, height)
+        if (gCtx.isPointInPath(clickedPos.x, clickedPos.y)) {
+            return true
+        }
 }

@@ -6,12 +6,14 @@ let gWordFilter = ''
 let gElCanvas
 let gCtx
 let gCurrMeme
+let gTextLinePos
 
 function onInit() {
     gElCanvas = document.querySelector('canvas')
     gCtx = gElCanvas.getContext('2d')
     renderGalleryMemes()
     renderWordFilterBar()
+    addListeners()
 }
 
 function onToggleMenu() {
@@ -37,6 +39,18 @@ function renderWordFilterBar() {
     document.querySelector('.word-filter-container').innerHTML = strHTMLs
 }
 
+function renderSavedMemes() {
+    gSavedMemes = loadFromStorage(STORAGE_KEY)
+    let strHTML = ''
+    if (gSavedMemes && gSavedMemes !== []) {
+        gSavedMemes.forEach(meme => {
+            strHTML += `<img id="${meme.id}" onclick="onSavedImgSelect(this.id)" src="img/${meme.currMeme.id}.jpg" alt="">`
+
+        })
+    }
+    document.querySelector('.gallery-grid-container').innerHTML = strHTML
+}
+
 function onFilterWordPressed(pressedWord) {
     const elFilteredWord = document.querySelector('.search-filter')
     elFilteredWord.value = pressedWord
@@ -48,18 +62,6 @@ function onFilterWordPressed(pressedWord) {
     renderWordFilterBar()
     onUpdateFilter(pressedWord)
 
-}
-
-function renderSavedMemes() {
-    gSavedMemes = loadFromStorage(STORAGE_KEY)
-    let strHTML = ''
-    if (gSavedMemes && gSavedMemes !== []) {
-        gSavedMemes.forEach(meme => {
-            strHTML += `<img id="${meme.id}" onclick="onSavedImgSelect(this.id)" src="img/${meme.currMeme.id}.jpg" alt="">`
-
-        })
-    }
-    document.querySelector('.gallery-grid-container').innerHTML = strHTML
 }
 
 function onImgSelect(id) {
