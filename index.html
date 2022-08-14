@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meme Generator - Omer Rafaeli</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body onload="onInit()">
+    <div class="main-screen" onclick="onToggleMenu()"></div>
+    <header class="header-container flex align-center space-between full">
+        <div class="logo">Meme-Gen</div>
+        <nav class="nav-bar-container">
+            <ul class="nav-bar clean-list flex">
+                <li><a class="btn" name="gallery" onclick="onChangeWindow(this.name)">Gallery</a></li>
+                <li><a class="btn" name="meme" onclick="onChangeWindow(this.name)">Memes</a></li>
+                <!-- <li><a class="btn" onclick="onOpenAbout()">About</a></li> -->
+            </ul>
+            <button class="toggle-menu" onclick="onToggleMenu()">☰</button>
+        </nav>
+    </header>
+    <main>
+        <section class="editor-container flex align-center space-between none">
+            <div class="canvas-container ">
+                <canvas id="my-canvas" height="1024" width="1024"></canvas>
+            </div>
+            <div class="canvas-controller flex column align-center space-between">
+                <input class="meme-txt-input" value="Enter Text Here" type="text" onfocus="this.value=''" oninput="onEditTxt(this.value)">
+                <div class="text-line-controller flex space-between">
+                    <button name="moveUp" class="btn editor-btn move-line-up-btn" onclick="onMoveLine(this.name)">↑</button>
+                    <button name="moveDown" class="btn editor-btn move-line-down-btn" onclick="onMoveLine(this.name)">↓</button>
+                    <button class="btn editor-btn switch-line-btn" onclick="onSwitchLine()">↓↑</button>
+                    <button class="btn editor-btn add-line-btn" onclick="onCreateTxtLine()">+</button>
+                    <button class="btn editor-btn delete-line-btn" onclick="onRemoveLine()">🗑</button>
+                </div>
+                <div class="canvas-font-controller">
+                    <button name="bigger" class="btn editor-btn bigger-font-btn"
+                        onclick="onChangeTextSize(this.name)">A↾</button>
+                    <button name="smaller" class="btn editor-btn smaller-font-btn"
+                        onclick="onChangeTextSize(this.name)">A⇂</button>
+                    <button name="ltr" class="btn editor-btn ltr-btn" onclick="onChangeTxtDirection(this.name)">⁋</button>
+                    <button name="c" class="btn editor-btn center-txt-btn" onclick="onChangeTxtDirection(this.name)">C</button>
+                    <button name="rtl" class="btn editor-btn rtl-btn" onclick="onChangeTxtDirection(this.name)">¶</button>
+                    <br>
+                    <select class="editor-btn text-font-select" name="" id="">
+                        <option value="impact">IMPACT</option>
+                        <option value="poppins-lite">POPPINS-LT</option>
+                        <option value="poppins-med">POPPINS-MD</option>
+                        <option value="times">TIMES</option>
+                    </select>
+                    <input name="stroke" class="btn editor-btn stroke-color-btn" type="color" onchange="onSetColor(this, this.value)">
+                    <input name="txt" class="btn editor-btn txt-color-btn" type="color" onchange="onSetColor(this, this.value)">
+                </div>
+                <div class="social">
+                    <button class="btn save-btn" onclick="onSaveMemes()">Save</button>
+                </div>
+            </div>
+        </section>
+        <section class="gallery-container">
+            <section class="filter-container flex">
+                <label class="search-label" for="">
+                    <input list="keywords" class="search-filter" type="text" placeholder="Search &#x1F50D" oninput="onUpdateFilter(this.value)">
+                    <datalist id="keywords">
+                        <option value="president">
+                            <option value="politics">
+                            <option value="angry">
+                            <option value="funny">
+                            <option value="baby">
+                            <option value="man">
+                            <option value="animals">
+                            <option value="movie">
+                            <option value="music">
+                    </datalist>                    
+                </label>
+                <label class="flex align-center word-filter-container" for="" >
+                </label>
+                <!-- <button class="gallery-btn more-btn">More</button> -->
+            </section>
+            <section class="gallery-grid-container">
+            </section>
+        </section>
+    </main>
+    <footer></footer>
+    <script src="js/service/util.service.js"></script>
+    <script src="js/service/storage.service.js"></script>
+    <script src="js/service/meme.service.js"></script>
+    <script src="js/meme.controller.js"></script>
+    <script src="js/gallery.controller.js"></script>
+</body>
+
+</html>
